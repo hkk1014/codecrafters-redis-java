@@ -18,8 +18,14 @@ public class Main {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
             // Wait for connection from client.
+
             clientSocket = serverSocket.accept();
-            clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
+
+            while (clientSocket != null) {
+                clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
+
+            }
+
 
 //            handle(clientSocket);
         } catch (IOException e) {
