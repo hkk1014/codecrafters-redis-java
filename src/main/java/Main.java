@@ -20,7 +20,7 @@ public class Main {
             byte[] buf = new byte[256];
             while (clientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
                 DataOutputStream outPutStream = new DataOutputStream(clientSocket.getOutputStream());
-                outPutStream.write("PONG\r\n".getBytes());
+                outPutStream.write("+PONG\r\n".getBytes());
                 outPutStream.flush();
             }
 
