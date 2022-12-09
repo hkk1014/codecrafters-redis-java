@@ -1,4 +1,7 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -16,6 +19,9 @@ public class Main {
             serverSocket.setReuseAddress(true);
             // Wait for connection from client.
             clientSocket = serverSocket.accept();
+            clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
+
+//            handle(clientSocket);
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         } finally {
@@ -27,5 +33,33 @@ public class Main {
                 System.out.println("IOException: " + e.getMessage());
             }
         }
+    }
+
+    private static void handle(Socket clientSocket) {
+        try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        ) {
+            char[] buffer = new char[100];
+            final int readBytes = in.read(buffer);
+            final String[] request = parseRequest(buffer, readBytes);
+            if ("ping".equals(request[1])) {
+                if (request.length == 2) {
+                    out.print("+PONG\r\n");
+                } else if (request.length == 4) {
+                    out.print("+" + request[3] + "\r\n");
+                } else {
+                    out.print("-Error!\r\n");
+                }
+            }
+
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static String[] parseRequest(char[] buffer, int readBytes) {
+        return String.valueOf(buffer, 4, readBytes - 4).split("\r\n");
     }
 }
