@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -20,11 +17,11 @@ public class Main {
             // Wait for connection from client.
 
             clientSocket = serverSocket.accept();
-
-            while (clientSocket.isConnected()) {
-                clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
-                clientSocket.close();
-                clientSocket = serverSocket.accept();
+            byte[] buf = new byte[256];
+            while (clientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
+                DataOutputStream outPutStream = new DataOutputStream(clientSocket.getOutputStream());
+                outPutStream.write("PONG\r\n".getBytes());
+                outPutStream.flush();
             }
 
 
