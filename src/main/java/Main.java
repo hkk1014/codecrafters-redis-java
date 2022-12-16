@@ -17,31 +17,33 @@ public class Main {
 
 
             ServerSocket finalServerSocket = serverSocket;
-            new Thread(() -> {
-                Socket clientSocket = null;
-                try {
-                    clientSocket = finalServerSocket.accept();
-
-                    byte[] buf = new byte[256];
-                    while (clientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
-                        DataOutputStream outPutStream = new DataOutputStream(clientSocket.getOutputStream());
-                        outPutStream.write("+PONG\r\n".getBytes());
-                        outPutStream.flush();
-                    }
-                } catch (Exception e) {
-
-                } finally {
+            while (true) {
+                new Thread(() -> {
+                    Socket clientSocket = null;
                     try {
-                        if (clientSocket != null) {
-                            clientSocket.close();
+                        clientSocket = finalServerSocket.accept();
+
+                        byte[] buf = new byte[256];
+                        while (clientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
+                            DataOutputStream outPutStream = new DataOutputStream(clientSocket.getOutputStream());
+                            outPutStream.write("+PONG\r\n".getBytes());
+                            outPutStream.flush();
                         }
-                    } catch (IOException e) {
-                        System.out.println("IOException: " + e.getMessage());
+                    } catch (Exception e) {
+
+                    } finally {
+                        try {
+                            if (clientSocket != null) {
+                                clientSocket.close();
+                            }
+                        } catch (IOException e) {
+                            System.out.println("IOException: " + e.getMessage());
+                        }
                     }
-                }
 
 
-            }).start();
+                }).start();
+            }
 
 
 //            handle(clientSocket);
