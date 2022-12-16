@@ -18,20 +18,26 @@ public class Main {
 
             clientSocket = serverSocket.accept();
 
-            Socket finalClientSocket = clientSocket;
-            new Thread(() -> {
-                try {
-                    byte[] buf = new byte[256];
-                    while (finalClientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
-                        DataOutputStream outPutStream = new DataOutputStream(finalClientSocket.getOutputStream());
-                        outPutStream.write("+PONG\r\n".getBytes());
-                        outPutStream.flush();
-                    }
-                } catch (Exception e) {
-                    System.out.println("erro");
-                }
+            try {
+                byte[] buf = new byte[256];
+                while (clientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
+                    Socket finalClientSocket = clientSocket;
+                    new Thread(() -> {
+                        try {
+                            DataOutputStream outPutStream = new DataOutputStream(finalClientSocket.getOutputStream());
+                            outPutStream.write("+PONG\r\n".getBytes());
+                            outPutStream.flush();
+                        } catch (Exception e) {
 
-            }).start();
+                        }
+
+                    }).start();
+
+
+                }
+            } catch (Exception e) {
+                System.out.println("erro");
+            }
 
 
 //            handle(clientSocket);
