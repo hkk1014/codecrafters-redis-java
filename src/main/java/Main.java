@@ -17,12 +17,21 @@ public class Main {
             // Wait for connection from client.
 
             clientSocket = serverSocket.accept();
-            byte[] buf = new byte[256];
-            while (clientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
-                DataOutputStream outPutStream = new DataOutputStream(clientSocket.getOutputStream());
-                outPutStream.write("+PONG\r\n".getBytes());
-                outPutStream.flush();
-            }
+
+            Socket finalClientSocket = clientSocket;
+            new Thread(() -> {
+                try {
+                    byte[] buf = new byte[256];
+                    while (finalClientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
+                        DataOutputStream outPutStream = new DataOutputStream(finalClientSocket.getOutputStream());
+                        outPutStream.write("+PONG\r\n".getBytes());
+                        outPutStream.flush();
+                    }
+                } catch (Exception e) {
+                    System.out.println("erro");
+                }
+
+            }).start();
 
 
 //            handle(clientSocket);
