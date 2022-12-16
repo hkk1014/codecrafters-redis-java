@@ -9,48 +9,44 @@ public class Main {
 
 //      Uncomment this block to pass the first stage
         ServerSocket serverSocket = null;
-        Socket clientSocket = null;
         int port = 6379;
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
             // Wait for connection from client.
 
-            clientSocket = serverSocket.accept();
 
-            try {
-                byte[] buf = new byte[256];
-                while (clientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
-                    Socket finalClientSocket = clientSocket;
-                    new Thread(() -> {
-                        try {
-                            DataOutputStream outPutStream = new DataOutputStream(finalClientSocket.getOutputStream());
-                            outPutStream.write("+PONG\r\n".getBytes());
-                            outPutStream.flush();
-                        } catch (Exception e) {
+            ServerSocket finalServerSocket = serverSocket;
+            new Thread(() -> {
+                Socket clientSocket = null;
+                try {
+                    clientSocket = finalServerSocket.accept();
 
+                    byte[] buf = new byte[256];
+                    while (clientSocket.getInputStream().read(buf, 0, buf.length) != 0) {
+                        DataOutputStream outPutStream = new DataOutputStream(clientSocket.getOutputStream());
+                        outPutStream.write("+PONG\r\n".getBytes());
+                        outPutStream.flush();
+                    }
+                } catch (Exception e) {
+
+                } finally {
+                    try {
+                        if (clientSocket != null) {
+                            clientSocket.close();
                         }
-
-                    }).start();
-
-
+                    } catch (IOException e) {
+                        System.out.println("IOException: " + e.getMessage());
+                    }
                 }
-            } catch (Exception e) {
-                System.out.println("erro");
-            }
+
+
+            }).start();
 
 
 //            handle(clientSocket);
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
-        } finally {
-            try {
-                if (clientSocket != null) {
-                    clientSocket.close();
-                }
-            } catch (IOException e) {
-                System.out.println("IOException: " + e.getMessage());
-            }
         }
     }
 
